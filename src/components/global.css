@@ -1,0 +1,30 @@
+
+
+.glow {
+   color: #f04;
+   text-shadow:
+   /* Pinkish glow */
+   0 0 7px #f04,
+   0 0 10px #f04,
+   0 0 21px #f04,
+   /* Reddish glow */
+   0 0 42px #f02,
+   0 0 82px #f02,
+   0 0 92px #f02,
+   0 0 102px #f02,
+   0 0 151px #f02;
+}
+
+.glow-min {
+   color: #f06;
+   text-shadow:
+   0 0 1px #f04,
+   0 0 2px #f04,
+   0 0 5px #f04,
+   0 0 10px #f02,
+   0 0 15px #f02,
+   0 0 20px #f02,
+   0 0 22px #f02,
+   0 0 30px #f02;  
+}
+

@@ -3,7 +3,7 @@ import type { GatsbyConfig } from "gatsby";
 const config: GatsbyConfig = {
   siteMetadata: {
     title: `xmo`,
-    siteUrl: `https://www.yourdomain.tld`
+    siteUrl: `https://www.devxmo.io`
   },
   plugins: ["gatsby-plugin-styled-components", {
     resolve: 'gatsby-plugin-google-analytics',

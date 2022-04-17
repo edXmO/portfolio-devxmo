@@ -1,178 +1,353 @@
-import * as React from "react"
+import React, { useEffect, useRef, useState } from 'react'
+import Layout from "../components/layout"
+import styled from 'styled-components'
+import { ScrollTrigger } from "gsap/src/all"
+import gsap from "gsap";
+import Scroll from '../components/ScrollDown';
+import { fillRefArray } from '../utils/utils';
 
-// styles
+gsap.registerPlugin(ScrollTrigger);
+
 const pageStyles = {
   color: "#232129",
-  padding: 96,
+  background: "#000",
   fontFamily: "-apple-system, Roboto, sans-serif, serif",
-}
-const headingStyles = {
-  marginTop: 0,
-  marginBottom: 64,
-  maxWidth: 320,
-}
-const headingAccentStyles = {
-  color: "#663399",
-}
-const paragraphStyles = {
-  marginBottom: 48,
-}
-const codeStyles = {
-  color: "#8A6534",
-  padding: 4,
-  backgroundColor: "#FFF4DB",
-  fontSize: "1.25rem",
-  borderRadius: 4,
-}
-const listStyles = {
-  marginBottom: 96,
-  paddingLeft: 0,
-}
-const listItemStyles = {
-  fontWeight: 300,
-  fontSize: 24,
-  maxWidth: 560,
-  marginBottom: 30,
+  scrollSnapType: "y mandatory",
+  scrollSnapPointsY: "repeat(100%)",
+  scrollSnapStop: "start",
+  overflow: "auto"
 }
 
-const linkStyle = {
-  color: "#8954A8",
-  fontWeight: "bold",
-  fontSize: 16,
-  verticalAlign: "5%",
+const HomeSection = styled.section.attrs(props => (
+  { className: props.className }
+))`
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  scroll-snap-align: end;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 1.5em 0;
+  background: #000;
+  & .reveal {
+    position: relative;
+    color: #fff;
+    fontSize: 2.5em;
+    padding: 0 10px; 
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: 0.5s;
+    transition-delay: 0.5s;
+  }
+  & .reveal.active {
+    transform: scaleX(1);
+  }
+  & .reveal:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #f04;
+    transform-origin: right;
+    transition: 0.5s;
+    transition-delay: 0.5s;
+  }
+  & .reveal:nth-child(2) {
+    font-weight: 300;
+    font-size: 1.5em;
+    letter-spacing: 2px;
+    display: inline-block;
+  }
+
+  & .reveal:nth-child(2):before {
+    background: #f02;
+  }
+
+  & .reveal.active:before {
+    transform: scaleX(0);
+    transition-delay: 0.5s
+  }
+
+  img {
+    position: relative;
+    display: block;
+    margin-left: 10px;
+    margin-top: 10px;
+    max-with: 300px;
+  }
+
+`
+
+const SectionOne = styled.section.attrs(props => ({ className: props.className }
+))`
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  height: 60%;
+  width: 45vw;
+  height: 300px;
+  & .image_container { 
+    display: flex;
+    flex: 1;
+    min-width: 60%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    z-Index: 5;
+    margin: 1em 0 0 0;
+    background-color: #000;
+  }
+
+  & .image-container .active {
+    background-color: #fff;
+    transition: background-color 0.5s linear;
+  }
+
+  div > img:first-child {
+    width: 93%;
+    max-height: 150px;
+    position: relative;
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: 0.3s;
+    transition-delay: 0.5s;
+  }
+
+  div > img:first-child.active {
+    transform: scaleX(1);
+  }
+
+  div > img:not(:first-child) {
+    width: 45%;
+    max-height: 120px;
+  }
+
+  div > img:nth-child(2) {
+    position: relative;
+    transform-origin: bottom;
+    transform: scaleY(0);
+    transition: 0.4s;
+    transition-delay: 0.6s;
+  }
+
+  div > img:nth-child(2).active {
+    transform: scaleY(1);
+  }
+
+  div > img:nth-child(3) {
+    position: relative;
+    transform-origin: right;
+    transform: scaleX(0);
+    transition: 0.5s;
+    transition-delay: 0.7s;
+  }
+
+  div > img:nth-child(3).active {
+    transform: scaleX(1);
+  }
+  
+  div > p:first-child {
+    padding: 0.5em 1em 0em 1em;
+  }
+
+  div > p {
+    color: #fff;
+    padding: 1em;
+  }
+  
+  img {
+    position: relative;
+    display: block;
+    margin-left: 10px;
+    margin-top: 10px;
+    max-with: 300px;
+  }
+`
+
+const SvgArrow = styled.svg`
+  xmlns: "http://www.w3.org/2000/svg";
+  position: absolute;
+  z-index: 1;
+  top: 43vh;
+  fill: none;
+  width: 190px;
+  height: 576px;
+  view-box: 0 0 190 576;
+  filter: drop-shadow(0px 0px 1px rgb(255 0 68 / 1));
+  filter: drop-shadow(0px 0px 2px rgb(255 0 68 / 1));
+  filter: drop-shadow(0px 0px 5px rgb(255 0 68 / 1));
+  filter: drop-shadow(0px 0px 10px rgb(255 0 68 / 1));
+  filter: drop-shadow(0px 0px 15px rgb(255 0 34 / 1));
+  filter: drop-shadow(0px 0px 20px rgb(255 0 34 / 1));
+  filter: drop-shadow(0px 0px 22px rgb(255 0 34 / 1));
+  filter: drop-shadow(0px 0px 30px rgb(255 0 34 / 1)); 
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+`
+
+const headerStyle = {
+  minHeight: '100vh',
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 }
-
-const docLinkStyle = {
-  ...linkStyle,
-  listStyleType: "none",
-  marginBottom: 24,
-}
-
-const descriptionStyle = {
-  color: "#232129",
-  fontSize: 14,
-  marginTop: 10,
-  marginBottom: 0,
-  lineHeight: 1.25,
-}
-
-const docLink = {
-  text: "TypeScript Documentation",
-  url: "https://www.gatsbyjs.com/docs/how-to/custom-configuration/typescript/",
-  color: "#8954A8",
-}
-
-const badgeStyle = {
-  color: "#fff",
-  backgroundColor: "#088413",
-  border: "1px solid #088413",
-  fontSize: 11,
-  fontWeight: "bold",
-  letterSpacing: 1,
-  borderRadius: 4,
-  padding: "4px 6px",
-  display: "inline-block",
-  position: "relative" as "relative",
-  top: -2,
-  marginLeft: 10,
-  lineHeight: 1,
-}
-
-// data
-const links = [
-  {
-    text: "Tutorial",
-    url: "https://www.gatsbyjs.com/docs/tutorial/",
-    description:
-      "A great place to get started if you're new to web development. Designed to guide you through setting up your first Gatsby site.",
-    color: "#E95800",
-  },
-  {
-    text: "How to Guides",
-    url: "https://www.gatsbyjs.com/docs/how-to/",
-    description:
-      "Practical step-by-step guides to help you achieve a specific goal. Most useful when you're trying to get something done.",
-    color: "#1099A8",
-  },
-  {
-    text: "Reference Guides",
-    url: "https://www.gatsbyjs.com/docs/reference/",
-    description:
-      "Nitty-gritty technical descriptions of how Gatsby works. Most useful when you need detailed information about Gatsby's APIs.",
-    color: "#BC027F",
-  },
-  {
-    text: "Conceptual Guides",
-    url: "https://www.gatsbyjs.com/docs/conceptual/",
-    description:
-      "Big-picture explanations of higher-level Gatsby concepts. Most useful for building understanding of a particular topic.",
-    color: "#0D96F2",
-  },
-  {
-    text: "Plugin Library",
-    url: "https://www.gatsbyjs.com/plugins",
-    description:
-      "Add functionality and customize your Gatsby site or app with thousands of plugins built by our amazing developer community.",
-    color: "#8EB814",
-  },
-  {
-    text: "Build and Host",
-    url: "https://www.gatsbyjs.com/cloud",
-    badge: true,
-    description:
-      "Now you’re ready to show the world! Give your Gatsby site superpowers: Build and host on Gatsby Cloud. Get started for free!",
-    color: "#663399",
-  },
-]
-
-// markup
 const IndexPage = () => {
+  const mainContainerRef = useRef<HTMLElement | null>(null);
+  const sectionRefs = useRef<HTMLElement[]>([]);
+  const sectionHeaderRefs = useRef<HTMLHeadingElement[]>([]);
+  const sectionOneImgRefs = useRef<HTMLElement[]>([]);
+  const containerRef = useRef<HTMLElement | null>(null);
+  const svgRef = useRef<SVGPathElement | null>(null);
+
+  function scrollTriggerListener() {
+    sectionOneImgRefs.current.forEach(img => {
+      ScrollTrigger.create({
+        scroller: mainContainerRef.current,
+        trigger: img,
+        toggleClass: "active",
+        start: "top 95%",
+        end: "bottom 35%",
+        toggleActions: 'play none none reverse',
+        markers: false
+      })
+    })
+
+    sectionHeaderRefs.current.forEach(el => {
+      ScrollTrigger.create({
+        scroller: mainContainerRef.current,
+        trigger: el,
+        toggleClass: "active",
+        start: "top 90%",
+        end: "bottom 20%",
+        toggleActions: 'play none none reverse',
+        markers: false
+      })
+    })
+  }
+
+  function scrollToSection(index: number) {    
+    gsap.fromTo(svgRef.current,
+      {
+        strokeDashoffset: 1000,
+        strokeDasharray: 1000,
+      },
+      {
+        strokeDashoffset: 0,
+        strokeDasharray: 1000,
+        duration: 1,
+    })
+
+    if(index === 0){
+      gsap.fromTo(svgRef.current,
+        {
+          strokeDashoffset: 0,
+          strokeDasharray: 1000,
+        },
+        {
+          strokeDashoffset: 1000,
+          strokeDasharray: 1000,
+          duration: 1,
+      })
+    }
+
+    const section = sectionRefs.current[index];
+    section.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  useEffect(() => {
+    scrollTriggerListener();
+  }, []);
+
   return (
-    <main style={pageStyles}>
-      <title>Home Page</title>
-      <h1 style={headingStyles}>
-        Congratulations
-        <br />
-        <span style={headingAccentStyles}>— you just made a Gatsby site! </span>
-        🎉🎉🎉
-      </h1>
-      <p style={paragraphStyles}>
-        Edit <code style={codeStyles}>src/pages/index.tsx</code> to see this page
-        update in real-time. 😎
-      </p>
-      <ul style={listStyles}>
-        <li style={docLinkStyle}>
-          <a
-            style={linkStyle}
-            href={`${docLink.url}?utm_source=starter&utm_medium=ts-docs&utm_campaign=minimal-starter-ts`}
-          >
-            {docLink.text}
-          </a>
-        </li>
-        {links.map(link => (
-          <li key={link.url} style={{ ...listItemStyles, color: link.color }}>
-            <span>
-              <a
-                style={linkStyle}
-                href={`${link.url}?utm_source=starter&utm_medium=start-page&utm_campaign=minimal-starter-ts`}
-              >
-                {link.text}
-              </a>
-              {link.badge && (
-                <span style={badgeStyle} aria-label="New Badge">
-                  NEW!
-                </span>
-              )}
-              <p style={descriptionStyle}>{link.description}</p>
-            </span>
-          </li>
-        ))}
-      </ul>
-      <img
-        alt="Gatsby G Logo"
-        src="data:image/svg+xml,%3Csvg width='24' height='24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2a10 10 0 110 20 10 10 0 010-20zm0 2c-3.73 0-6.86 2.55-7.75 6L14 19.75c3.45-.89 6-4.02 6-7.75h-5.25v1.5h3.45a6.37 6.37 0 01-3.89 4.44L6.06 9.69C7 7.31 9.3 5.63 12 5.63c2.13 0 4 1.04 5.18 2.65l1.23-1.06A7.959 7.959 0 0012 4zm-8 8a8 8 0 008 8c.04 0 .09 0-8-8z' fill='%23639'/%3E%3C/svg%3E"
-      />
-    </main>
+    <Layout scrollToSection={scrollToSection}>
+      <main
+        ref={ref => { if (ref) { mainContainerRef.current = ref } }}
+        //@ts-ignore
+        style={pageStyles}>
+        <HomeSection
+          ref={ref => { if (ref) { sectionRefs.current.push(ref) } }}>
+          <div
+            ref={ref => { if (ref) containerRef.current = ref }}
+            style={headerStyle}>
+            <SvgArrow>
+              <path
+                ref={ref => { if (ref) svgRef.current = ref }}
+                d="M125.25 1C125.25 16 219 45 87 16C-45 -13 71.9999 156 50 181C28 206 -68.8022 213.579 92.0989 315.79C253 418 125.25 491.202 125.25 572.5L149.25 544.622"
+                stroke="#FF0066"
+                stroke-width="2"
+                stroke-linecap="round"
+              />
+            </SvgArrow>
+            <Scroll
+              scrollToSection={scrollToSection} />
+          </div>
+        </HomeSection>
+        <HomeSection
+          ref={ref => { if (ref) { sectionRefs.current.push(ref) } }}>
+          <div>
+            <h2
+              ref={ref => { if (ref) { sectionHeaderRefs.current.push(ref) } }}
+              className="reveal">
+              Dream. Believe.
+            </h2>
+            <h2
+              ref={ref => { if (ref) { sectionHeaderRefs.current.push(ref) } }}
+              style={{ color: "#f06" }}
+              className="reveal glow-min">
+              Create.
+            </h2>
+            <SectionOne>
+              <div
+                ref={ref => { if (ref) { sectionOneImgRefs.current.push(ref) } }}
+                className="image_container">
+                <img ref={ref => { if (ref) { sectionOneImgRefs.current.push(ref) } }} src={'../images/kissland.jpeg'} />
+                <img ref={ref => { if (ref) { sectionOneImgRefs.current.push(ref) } }} src={'../images/kissland.jpeg'} />
+                <img ref={ref => { if (ref) { sectionOneImgRefs.current.push(ref) } }} src={'../images/kissland.jpeg'} />
+              </div>
+              <div>
+                <p>Text</p>
+                <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Omnis quia laborum tempore ab.</p>
+                <p>Exercitationem nostrum illo dignissimos voluptate eligendi porro neque sapiente fugiat minima beatae odio accusamus labore veritatis sunt?</p>
+              </div>
+            </SectionOne>
+          </div>
+        </HomeSection>
+        <HomeSection ref={ref => { if (ref) { sectionRefs.current.push(ref) } }}>
+          <div>
+            <h2
+              ref={ref => { if (ref) { sectionHeaderRefs.current.push(ref) } }}
+              className="reveal">
+              Reveal Content on Scroll
+            </h2>
+            <h2
+              ref={ref => { if (ref) { sectionHeaderRefs.current.push(ref) } }}
+              className="reveal">
+              Reveal Content
+            </h2>
+            <img src={'../images/kissland.jpeg'} height="250px" width="335px" />
+          </div>
+        </HomeSection>
+        <HomeSection ref={ref => { if (ref) { sectionRefs.current.push(ref) } }}>
+          <div>
+            <h2
+              ref={ref => ref && fillRefArray(sectionHeaderRefs.current, ref)}
+              className="reveal">
+              Reveal Content on Scroll
+            </h2>
+            <h2
+              ref={ref => ref && fillRefArray(sectionHeaderRefs.current, ref)}
+              className="reveal">
+              Reveal Content
+            </h2>
+            <img src={'../images/kissland.jpeg'} height="250px" width="335px" />
+          </div>
+        </HomeSection>
+      </main>
+    </Layout>
   )
 }
 
