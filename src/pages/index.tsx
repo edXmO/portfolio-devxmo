@@ -202,6 +202,7 @@ const IndexPage = () => {
   const sectionOneImgRefs = useRef<HTMLElement[]>([]);
   const containerRef = useRef<HTMLElement | null>(null);
   const svgRef = useRef<SVGPathElement | null>(null);
+  const [activeSection, setActiveSection] = useState(0);
 
   function scrollTriggerListener() {
     sectionOneImgRefs.current.forEach(img => {
@@ -255,7 +256,8 @@ const IndexPage = () => {
     }
 
     const section = sectionRefs.current[index];
-    section.scrollIntoView({ behavior: 'smooth' });
+    section && section.scrollIntoView({ behavior: 'smooth' });
+    setActiveSection(index);
   }
 
   useEffect(() => {
@@ -263,7 +265,7 @@ const IndexPage = () => {
   }, []);
 
   return (
-    <Layout scrollToSection={scrollToSection}>
+    <Layout scrollToSection={scrollToSection} activeSection={activeSection}>
       <main
         ref={ref => { if (ref) { mainContainerRef.current = ref } }}
         //@ts-ignore
@@ -282,8 +284,7 @@ const IndexPage = () => {
                 stroke-linecap="round"
               />
             </SvgArrow>
-            <Scroll
-              scrollToSection={scrollToSection} />
+            <Scroll scrollToSection={scrollToSection} />
           </div>
         </HomeSection>
         <HomeSection

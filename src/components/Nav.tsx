@@ -2,8 +2,6 @@ import React, { useEffect, useRef} from 'react'
 import styled from "styled-components"
 import gsap from 'gsap';
 
-
-
 const NavContainer = styled.div`
    position: fixed;
    z-index: 10;
@@ -32,7 +30,7 @@ const NavItem = styled.div`
    color: #fff;
    user-select: none;
    cursor: pointer;
-   font-weight: 600;
+   font-weight: 500;
    font-size: 1.6em;
    transition: 0.4s ease-in;
    &:hover {
@@ -47,6 +45,21 @@ const NavItem = styled.div`
       0 0 22px #f02,
       0 0 30px #f02;  
       transition: color 0.8s;
+      easing: ease-in-out;
+   }
+
+   &.active {
+      color: #f06;
+      text-shadow:
+      0 0 1px #f04,
+      0 0 2px #f04,
+      0 0 5px #f04,
+      0 0 10px #f03,
+      0 0 15px #f03,
+      0 0 20px #f03,
+      0 0 22px #f03,
+      0 0 30px #f03;  
+      transition: color 0.8s infinite;
       easing: ease-in-out;
    }
 `
@@ -64,11 +77,11 @@ const SideNavBtn = styled.a`
 const tl = gsap.timeline();
 
 export default function Nav(
-   { scrollToSection }
+   { scrollToSection, activeSection }
       :
-      {  scrollToSection: (index: number) => void }) {
+      {  scrollToSection: (index: number) => void, activeSection: number }) {
 
-   const navItemRefs = useRef<HTMLElement[]>([]);
+   const navItemRefs = useRef<any[]>([]);
 
    useEffect(() => {
       if (navItemRefs.current.length > 0) { 
@@ -90,17 +103,17 @@ export default function Nav(
             <NavItemContainer
                onClick={() => scrollToSection(0)}
                ref={ref => { if (ref) navItemRefs.current.push(ref) }}>
-               <NavItem>HOME</NavItem>
+               <NavItem className={`${activeSection === 0 ? 'active' : ''}`}>HOME</NavItem>
             </NavItemContainer>
             <NavItemContainer
                onClick={() => scrollToSection(1)}
                ref={ref => { if (ref) navItemRefs.current.push(ref) }}>
-               <NavItem>WHO</NavItem>
+               <NavItem className={`${activeSection === 1 ? 'active' : ''}`}>WHO</NavItem>
             </NavItemContainer>
             <NavItemContainer
                onClick={() => scrollToSection(2)}
                ref={ref => { if (ref) navItemRefs.current.push(ref) }}>
-               <NavItem>CONTACT</NavItem>
+               <NavItem className={`${activeSection === 2 ? 'active' : ''}`}>CONTACT</NavItem>
             </NavItemContainer>
          </NavContainer>
       </>
